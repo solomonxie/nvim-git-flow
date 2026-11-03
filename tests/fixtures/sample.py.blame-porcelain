@@ -1,0 +1,351 @@
+e0d12994785438b730131538a543635c360361de 1 1 4
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	import os
+e0d12994785438b730131538a543635c360361de 2 2
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 3 3
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 4 4
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	def first(a, b):
+a1b5a759a899cc646af3338c58d152f1907e1218 5 5 1
+author Alice Doe
+author-mail <alice@example.com>
+author-time 1793527200
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1793527200
+committer-tz +0000
+summary Add zero to total
+previous e0d12994785438b730131538a543635c360361de sample.py
+filename sample.py
+	    total = a + b + 0
+e0d12994785438b730131538a543635c360361de 6 6 4
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    return total
+e0d12994785438b730131538a543635c360361de 7 7
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 8 8
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 9 9
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	def second(items):
+0000000000000000000000000000000000000000 10 10 1
+author External file (--contents)
+author-mail <external.file>
+author-time 1793663653
+author-tz -0700
+committer External file (--contents)
+committer-mail <external.file>
+committer-time 1793663653
+committer-tz -0700
+summary Version of sample.py from standard input
+previous a1b5a759a899cc646af3338c58d152f1907e1218 sample.py
+filename sample.py
+	    out = []  # uncommitted
+e0d12994785438b730131538a543635c360361de 11 11 17
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    for item in items:
+e0d12994785438b730131538a543635c360361de 12 12
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	        out.append(item * 2)
+e0d12994785438b730131538a543635c360361de 13 13
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    return out
+e0d12994785438b730131538a543635c360361de 14 14
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 15 15
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 16 16
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	def third(path):
+e0d12994785438b730131538a543635c360361de 17 17
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    if os.path.exists(path):
+e0d12994785438b730131538a543635c360361de 18 18
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	        return open(path).read()
+e0d12994785438b730131538a543635c360361de 19 19
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    return None
+e0d12994785438b730131538a543635c360361de 20 20
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 21 21
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 22 22
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	class Holder:
+e0d12994785438b730131538a543635c360361de 23 23
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    def __init__(self, value):
+e0d12994785438b730131538a543635c360361de 24 24
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	        self.value = value
+e0d12994785438b730131538a543635c360361de 25 25
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	
+e0d12994785438b730131538a543635c360361de 26 26
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	    def get(self):
+e0d12994785438b730131538a543635c360361de 27 27
+author Test
+author-mail <test@example.com>
+author-time 1790856000
+author-tz +0000
+committer Test
+committer-mail <test@example.com>
+committer-time 1790856000
+committer-tz +0000
+summary fixtures
+boundary
+filename sample.py
+	        return self.value
