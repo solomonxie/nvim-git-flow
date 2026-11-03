@@ -13,6 +13,7 @@
 --   t:diffsplit_buf   the scratch copy's buffer number (-1 / unset: not a diff tab)
 --   t:diffsplit_src   the user's buffer being compared
 --   t:diffsplit_from  the tab the diff was opened from
+--   t:diffsplit_from_win  the window the diff was opened from; it gets the diff's cursor back
 --   t:diffsplit_resized  the terminal was resized while this diff tab was in the background
 
 local git = require('nvim-git-flow.git')
@@ -84,7 +85,15 @@ local function finish(src_win, src_buf, copy)
     end
     if #vim.api.nvim_list_tabpages() > 1 then
         local was_current = tab == vim.api.nvim_get_current_tabpage()
+        -- where you were in the diff, so the window you came from lands on the same spot
+        local view = vim.api.nvim_win_call(src_win, vim.fn.winsaveview)
+        local ok_win, from_win = pcall(vim.api.nvim_tabpage_get_var, tab, 'diffsplit_from_win')
         vim.cmd('tabclose ' .. vim.api.nvim_tabpage_get_number(tab))
+        if ok_win and vim.api.nvim_win_is_valid(from_win) and vim.api.nvim_win_get_buf(from_win) == src_buf then
+            vim.api.nvim_win_call(from_win, function()
+                vim.fn.winrestview(view)
+            end)
+        end
         if was_current and ok_from and vim.api.nvim_tabpage_is_valid(from) then
             vim.api.nvim_set_current_tabpage(from)
         end
@@ -186,11 +195,13 @@ function M.open(ref)
     local ft = vim.bo.filetype
     local src_buf = vim.api.nvim_get_current_buf()
     local from = vim.api.nvim_get_current_tabpage()
+    local from_win = vim.api.nvim_get_current_win()
 
     vim.cmd('tab split')
     vim.t.diffsplit_buf = -1
     vim.t.diffsplit_src = src_buf
     vim.t.diffsplit_from = from
+    vim.t.diffsplit_from_win = from_win
     local src_win = vim.api.nvim_get_current_win()
     vim.t.diffsplit_src_win = src_win
     vim.cmd('diffthis')

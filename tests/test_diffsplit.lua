@@ -286,4 +286,27 @@ function T.test_manual_split_width_kept_without_resize()
     keys('q')
 end
 
+function T.test_cursor_carried_back_on_close()
+    local _, buf = setup()
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    local from_win = vim.api.nvim_get_current_win()
+    diffsplit.open()
+    vim.api.nvim_win_set_cursor(0, { 18, 4 })
+    keys('q')
+    h.eq(vim.api.nvim_get_current_win(), from_win, 'back in the window you came from')
+    h.eq(vim.api.nvim_win_get_buf(0), buf, 'same buffer')
+    h.eq(vim.api.nvim_win_get_cursor(0), { 18, 4 }, 'cursor where it was in the diff')
+end
+
+function T.test_cursor_carried_back_from_left_side()
+    local _, buf = setup()
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    diffsplit.open()
+    vim.api.nvim_win_set_cursor(0, { 20, 0 })
+    vim.cmd('wincmd h')
+    keys('q')
+    h.eq(vim.api.nvim_win_get_buf(0), buf, 'same buffer')
+    h.eq(vim.api.nvim_win_get_cursor(0)[1], 20, 'cursor line from the diff')
+end
+
 return T
