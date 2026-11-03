@@ -237,4 +237,53 @@ function T.test_last_tab_only_diffoff()
     h.eq(vim.wo.diff, false, 'diff off')
 end
 
+-- Both widths, left then right, of the current diff tab.
+local function widths()
+    return { vim.api.nvim_win_get_width(tab_wins()[1]), vim.api.nvim_win_get_width(tab_wins()[2]) }
+end
+
+local function resize(cols)
+    vim.o.columns = cols
+    vim.api.nvim_exec_autocmds('VimResized', {})
+end
+
+function T.test_terminal_shrink_keeps_both_sides()
+    setup()
+    resize(120)
+    diffsplit.open()
+    resize(60)
+    local w = widths()
+    assert(math.abs(w[1] - w[2]) <= 1, 'even split after shrink: ' .. vim.inspect(w))
+    resize(120)
+    w = widths()
+    assert(math.abs(w[1] - w[2]) <= 1, 'even split after grow: ' .. vim.inspect(w))
+    keys('q')
+end
+
+function T.test_background_diff_tab_evened_on_return()
+    setup()
+    resize(120)
+    local first_tab = vim.api.nvim_get_current_tabpage()
+    diffsplit.open()
+    local diff_tab = vim.api.nvim_get_current_tabpage()
+    vim.api.nvim_set_current_tabpage(first_tab)
+    resize(60)
+    vim.cmd('tabnext ' .. vim.api.nvim_tabpage_get_number(diff_tab))
+    local w = widths()
+    assert(math.abs(w[1] - w[2]) <= 1, 'even split on return: ' .. vim.inspect(w))
+    h.eq(vim.t.diffsplit_resized, nil, 'flag cleared')
+    keys('q')
+end
+
+function T.test_manual_split_width_kept_without_resize()
+    setup()
+    resize(120)
+    diffsplit.open()
+    vim.api.nvim_win_set_width(tab_wins()[1], 30)
+    vim.cmd('tabprevious')
+    vim.cmd('tabnext')
+    h.eq(widths()[1], 30, 'your own split width stays')
+    keys('q')
+end
+
 return T

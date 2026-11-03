@@ -6,12 +6,14 @@
 -- that tab's windows only: right = your real buffer (edits stay), left = a read-only scratch copy.
 -- q in either window (or :q on the left, or close() from your own close-buffer mapping) ends it
 -- and brings you back to the tab you came from. ]c / [c jump between changes; folds are off,
--- zi brings them back.
+-- zi brings them back. When the terminal is resized (a tmux pane dragged, say) both sides are
+-- split evenly again, instead of Neovim taking all the lost width from your buffer on the right.
 --
 -- Tab-local state (so several diff tabs can be open at once):
 --   t:diffsplit_buf   the scratch copy's buffer number (-1 / unset: not a diff tab)
 --   t:diffsplit_src   the user's buffer being compared
 --   t:diffsplit_from  the tab the diff was opened from
+--   t:diffsplit_resized  the terminal was resized while this diff tab was in the background
 
 local git = require('nvim-git-flow.git')
 local base = require('nvim-git-flow.base')
@@ -117,6 +119,44 @@ local function q_expr()
     return 'q'
 end
 
+-- Split the current diff tab's two windows evenly.
+local function equalize()
+    if M.is_diff_tab() then
+        vim.cmd('wincmd =')
+    end
+    vim.t.diffsplit_resized = nil
+end
+
+-- Neovim fits a narrower terminal by shrinking the rightmost window, which hides the real
+-- buffer. Re-split the visible diff tab now, and background diff tabs once you go back to them.
+local resize_hooked = false
+local function hook_resize()
+    if resize_hooked then
+        return
+    end
+    resize_hooked = true
+    local group = vim.api.nvim_create_augroup('NvimGitFlowDiffSplit', { clear = true })
+    vim.api.nvim_create_autocmd('VimResized', {
+        group = group,
+        callback = function()
+            for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+                if tab_diff_buf(tab) then
+                    vim.api.nvim_tabpage_set_var(tab, 'diffsplit_resized', true)
+                end
+            end
+            equalize()
+        end,
+    })
+    vim.api.nvim_create_autocmd('TabEnter', {
+        group = group,
+        callback = function()
+            if vim.t.diffsplit_resized then
+                equalize()
+            end
+        end,
+    })
+end
+
 -- Open the diff tab for the current buffer against `ref` (default: the shared base).
 -- Returns true when the tab opened.
 function M.open(ref)
@@ -186,6 +226,7 @@ function M.open(ref)
     end, { buffer = copy, silent = true, desc = Q_DESC })
 
     vim.api.nvim_set_current_win(src_win)
+    hook_resize()
     vim.keymap.set('n', 'q', q_expr, { buffer = src_buf, expr = true, silent = true, desc = Q_DESC })
     return true
 end
