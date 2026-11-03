@@ -19,7 +19,9 @@ Bitbucket.
 - **Blame** (`:GitBlameToggle`): author, age and summary of the cursor line's commit as virtual text.
 - **Remote links**: open the file, or copy a link to it or to the selected lines.
 - **One diff base** (`:ChangeGitDiffBase [ref]`): signs and the diff tab compare against
-  `g:git_diff_base`. Other plugins can read it and listen for `User GitDiffBaseChanged`.
+  `g:git_diff_base`, and the name it was picked by (the ref you typed, or `main`/`master` for
+  the fork point) in `g:git_diff_base_name`. Other plugins can read them and listen for
+  `User GitDiffBaseChanged`.
 
 ## Install
 

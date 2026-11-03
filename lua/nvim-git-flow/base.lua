@@ -1,6 +1,7 @@
 -- The diff base: the one ref every git view diffs against (signs, :DiffSplit, and other plugins).
 -- Kept in g:git_diff_base so plugins that don't know this one can read it, and announced with
--- `doautocmd User GitDiffBaseChanged` whenever it changes.
+-- `doautocmd User GitDiffBaseChanged` whenever it changes. g:git_diff_base_name is the name it
+-- was picked by (the ref typed, or main/master for the fork point), for showing to the user.
 --
 -- :ChangeGitDiffBase          -> where this branch forked from main (fallback master), so views show
 --                                the whole branch like a PR; re-picked per repo on BufEnter
@@ -39,7 +40,7 @@ end
 function M.set(ref, quiet)
     local dir = dir_here()
     auto = ref == nil or ref == ''
-    local base, label
+    local base, label, name
     if auto then
         local trunk
         for _, candidate in ipairs({ 'main', 'master', 'origin/main', 'origin/master' }) do
@@ -57,10 +58,12 @@ function M.set(ref, quiet)
         local out, code = git.run(dir, { 'merge-base', 'HEAD', trunk })
         base = code == 0 and vim.trim(out) or nil
         label = 'merge-base with ' .. trunk
+        name = trunk
         auto_repo = git.root(dir)
     else
         base = git.rev_parse(dir, ref)
         label = ref
+        name = ref
     end
     if not base or base == '' then
         if not quiet then
@@ -70,6 +73,7 @@ function M.set(ref, quiet)
     end
     -- keep HEAD symbolic, so a commit moves the base along with it
     vim.g.git_diff_base = ref == 'HEAD' and 'HEAD' or base
+    vim.g.git_diff_base_name = name
     changed()
     if not quiet then
         vim.api.nvim_echo({ { 'Git diff base: ' .. label .. ' (' .. base:sub(1, 8) .. ')' } }, false, {})
@@ -108,6 +112,7 @@ function M.setup(start_ref)
         auto = true
     elseif vim.g.git_diff_base == nil or vim.g.git_diff_base == '' then
         vim.g.git_diff_base = start_ref
+        vim.g.git_diff_base_name = start_ref
     end
 end
 
