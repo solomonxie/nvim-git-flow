@@ -136,10 +136,10 @@ function T.test_undo_hunk()
     set(buf, 5, 6, { '    return a * b' })
     set(buf, 20, 19, { 'EXTRA = 2' })
     vim.api.nvim_win_set_cursor(0, { 5, 0 })
-    signs.undo_hunk()
+    signs.undo_hunk({ confirm = false })
     h.eq(kinds(buf), { { 'add', 21, 1, 20, 0 } }, 'only the other hunk is left')
     vim.api.nvim_win_set_cursor(0, { 21, 0 })
-    signs.undo_hunk()
+    signs.undo_hunk({ confirm = false })
     h.eq(vim.api.nvim_buf_get_lines(buf, 0, -1, false), orig, 'buffer back to base')
 end
 
@@ -148,8 +148,70 @@ function T.test_undo_delete_at_top()
     local orig = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     set(buf, 1, 2, {})
     vim.api.nvim_win_set_cursor(0, { 1, 0 })
-    signs.undo_hunk()
+    signs.undo_hunk({ confirm = false })
     h.eq(vim.api.nvim_buf_get_lines(buf, 0, -1, false), orig, 'buffer back to base')
+end
+
+-- Answer vim.fn.confirm() with `choice` (1 = Yes, 2 = No) and record the question asked.
+local function answer(choice, fn)
+    local real, asked = vim.fn.confirm, {}
+    vim.fn.confirm = function(msg)
+        table.insert(asked, msg)
+        return choice
+    end
+    local ok, err = pcall(fn)
+    vim.fn.confirm = real
+    assert(ok, err)
+    return asked
+end
+
+function T.test_undo_asks_and_yes_reverts()
+    local buf = open_sample()
+    local orig = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    set(buf, 5, 6, { '    return a * b' })
+    vim.api.nvim_win_set_cursor(0, { 5, 0 })
+    local done
+    local asked = answer(1, function() done = signs.undo_hunk() end)
+    h.eq(asked, { 'Undo hunk: revert line 5 to HEAD?' }, 'question names the lines and the base')
+    h.eq(done, true, 'reverted')
+    h.eq(vim.api.nvim_buf_get_lines(buf, 0, -1, false), orig, 'buffer back to base')
+end
+
+function T.test_undo_no_keeps_buffer()
+    local buf = open_sample()
+    set(buf, 5, 6, { '    return a * b' })
+    local edited = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    vim.api.nvim_win_set_cursor(0, { 5, 0 })
+    local done
+    answer(2, function() done = signs.undo_hunk() end)
+    h.eq(done, false, 'cancelled')
+    h.eq(vim.api.nvim_buf_get_lines(buf, 0, -1, false), edited, 'buffer untouched')
+end
+
+function T.test_undo_question_for_deleted_lines()
+    local buf = open_sample()
+    set(buf, 1, 2, {})
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    local asked = answer(2, function() signs.undo_hunk() end)
+    h.eq(asked, { 'Undo hunk: put back 2 deleted lines at the top to HEAD?' }, 'delete wording')
+end
+
+function T.test_undo_confirm_off_in_config()
+    local buf = open_sample()
+    local orig = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    set(buf, 5, 6, { '    return a * b' })
+    vim.api.nvim_win_set_cursor(0, { 5, 0 })
+    require('nvim-git-flow.config').setup({ undo = { confirm = false } })
+    local asked = answer(2, function() signs.undo_hunk() end)
+    require('nvim-git-flow.config').setup()
+    h.eq(asked, {}, 'no question')
+    h.eq(vim.api.nvim_buf_get_lines(buf, 0, -1, false), orig, 'reverted without asking')
+end
+
+function T.test_setup_maps_no_keys()
+    local before = #vim.api.nvim_get_keymap('n')
+    require('nvim-git-flow').setup({ base = 'HEAD' })
+    h.eq(#vim.api.nvim_get_keymap('n'), before, 'no global normal-mode keys added')
 end
 
 function T.test_stage_hunk()

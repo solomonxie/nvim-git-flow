@@ -646,12 +646,37 @@ function M.stage_hunk()
 end
 
 -- Put the base's lines back in place of the hunk under the cursor, as one undo step.
-function M.undo_hunk()
+-- Revert the hunk under the cursor to the base. Asks y/n first unless opts.confirm is false or
+-- config undo.confirm is off. Returns true when the buffer was changed.
+function M.undo_hunk(opts)
+    opts = opts or {}
     local hunks, buf = current_hunks()
     local h = hunk_at(hunks, api.nvim_win_get_cursor(0)[1])
     if not h then
         echo('No hunk under the cursor', 'WarningMsg')
-        return
+        return false
+    end
+    local ask = opts.confirm
+    if ask == nil then
+        ask = require('nvim-git-flow.config').options.undo.confirm
+    end
+    if ask then
+        local where
+        if h.type == 'delete' then
+            local n = h.old_count
+            where = string.format('put back %d deleted line%s %s', n, n == 1 and '' or 's',
+                h.start == 0 and 'at the top' or ('after line ' .. h.start))
+        else
+            local last = h.start + h.count - 1
+            where = 'revert ' .. (last > h.start and ('lines ' .. h.start .. '-' .. last) or ('line ' .. h.start))
+        end
+        local msg = string.format('Undo hunk: %s to %s?', where, require('nvim-git-flow.base').label())
+        local choice = vim.fn.confirm(msg, '&Yes\n&No', 2)
+        vim.cmd('redraw') -- clear the prompt, so the message below needs no Enter
+        if choice ~= 1 then
+            echo('Undo cancelled')
+            return false
+        end
     end
     if h.type == 'delete' then
         api.nvim_buf_set_lines(buf, h.start, h.start, false, h.old_lines)
@@ -662,6 +687,7 @@ function M.undo_hunk()
     local last = api.nvim_buf_line_count(buf)
     api.nvim_win_set_cursor(0, { math.min(math.max(h.start, 1), last), 0 })
     M.refresh(buf)
+    return true
 end
 
 ---------------------------------------------------------------------------------------------------

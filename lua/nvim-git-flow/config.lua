@@ -25,17 +25,11 @@ M.defaults = {
         -- virtual-text highlight
         hl = 'Comment',
     },
-    -- normal-mode mappings; set any to false to leave that key alone
-    keymaps = {
-        hunk_next = ']h',
-        hunk_prev = '[h',
-        hunk_preview = '<Leader>hp',
-        hunk_stage = '<Leader>hs',
-        hunk_undo = '<Leader>hu',
-        hunk_fold = false,
-        diff_split = false,
-        blame_toggle = false,
+    -- :GitHunkUndo asks y/n first; undo_hunk({ confirm = false }) skips it for one call
+    undo = {
+        confirm = true,
     },
+    -- No keymaps: the plugin maps no keys. Map the commands or the Lua functions in your own config.
 }
 
 M.options = vim.deepcopy(M.defaults)

@@ -31,25 +31,32 @@ Bitbucket.
 Plug 'solomonxie/nvim-git-flow'
 ```
 
-It works with no setup. To change options or add keys:
+It works with no setup. To change options:
 
 ```lua
 require('nvim-git-flow').setup({
-    base = 'HEAD',  -- '' = where the current branch forked from main/master
-    keymaps = {
-        hunk_next = ']h',
-        hunk_prev = '[h',
-        hunk_preview = '<Leader>hp',
-        hunk_stage = '<Leader>hs',
-        hunk_undo = '<Leader>hu',
-        hunk_fold = false,     -- e.g. 'gz'
-        diff_split = false,    -- e.g. 'gD'
-        blame_toggle = false,  -- e.g. 'tb'
-    },
+    base = 'HEAD',                -- '' = where the current branch forked from main/master
+    undo = { confirm = true },    -- :GitHunkUndo asks y/n first
 })
 ```
 
 Every option and its default is in [lua/nvim-git-flow/config.lua](lua/nvim-git-flow/config.lua).
+
+## Keys
+
+The plugin maps no keys. Map the commands, or the Lua functions, in your own config:
+
+```lua
+local signs = require('nvim-git-flow.signs')
+vim.keymap.set('n', ']h', signs.next_hunk, { desc = 'Git: next hunk' })
+vim.keymap.set('n', '[h', signs.prev_hunk, { desc = 'Git: previous hunk' })
+vim.keymap.set('n', '<Leader>hp', signs.preview_hunk, { desc = 'Git: preview hunk' })
+vim.keymap.set('n', '<Leader>hs', signs.stage_hunk, { desc = 'Git: stage hunk' })
+vim.keymap.set('n', '<Leader>hu', function() signs.undo_hunk() end, { desc = 'Git: undo hunk (asks first)' })
+vim.keymap.set('n', 'gz', signs.toggle_fold, { desc = 'Git: fold all but hunks' })
+vim.keymap.set('n', 'gD', '<Cmd>DiffSplit<CR>', { desc = 'Git: diff tab vs base' })
+vim.keymap.set('n', 'tb', '<Cmd>GitBlameToggle<CR>', { desc = 'Git: toggle line blame' })
+```
 
 ## Commands
 
@@ -59,7 +66,7 @@ Every option and its default is in [lua/nvim-git-flow/config.lua](lua/nvim-git-f
 | `:DiffSplit [ref]` | Side-by-side diff tab against `ref` (default: the diff base) |
 | `:GitHunkNext` / `:GitHunkPrev` | Jump to the next / previous hunk |
 | `:GitHunkPreview` | Show the hunk under the cursor in a float |
-| `:GitHunkStage` / `:GitHunkUndo` | Stage the hunk / revert it to the base |
+| `:GitHunkStage` / `:GitHunkUndo` | Stage the hunk / revert it to the base (asks y/n first) |
 | `:GitHunkFold` | Fold all but the hunks (toggle) |
 | `:GitHunks` | Hunks in the location list |
 | `:GitSignsToggle` | Turn signs on/off |
