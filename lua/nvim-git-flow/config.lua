@@ -15,7 +15,7 @@ M.defaults = {
         -- re-diff this long after the last edit
         debounce_ms = 200,
         -- skip buffers longer than this, or with a line longer than max_line_len
-        max_lines = 2000,
+        max_lines = 10000,
         max_line_len = 2000,
     },
     preview = {
