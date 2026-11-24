@@ -10,7 +10,8 @@ Bitbucket.
 ## Features
 
 - **Signs**: a bar in the sign column (and a colored line number) for added, changed and deleted
-  lines, updated as you type. Unsaved edits count. No signs outside git or in ignored files.
+  lines, updated as you type. Unsaved edits count. No signs outside git or in ignored files,
+  nor in a symlink to a file in another repo (`signs.follow_links = true` diffs it there).
 - **Hunks**: jump to the next/previous one, preview it in a float, stage it (`git apply --cached`),
   undo it back to the base, fold everything else away, or list them all in the location list.
 - **Diff tab** (`:DiffSplit [ref]`): the file at a ref on the left, your buffer on the right, in a

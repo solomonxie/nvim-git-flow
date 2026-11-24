@@ -88,10 +88,20 @@ end
 --   { kind = 'untracked', lines = {} }      in a repo but not tracked: everything is added
 --   { kind = 'tracked', lines = {...} }     the file at ref ({} when it's new since ref)
 -- Same steps as git.tracked() + git.show(), but async so opening a file never waits on git.
-local function load_base(path, ref, sync, done)
+local function load_base(path, ref, sync, done, link_dir)
     local dir = vim.fs.dirname(path)
     if vim.fn.isdirectory(dir) == 0 then
         return done({ kind = 'none' }) -- a new file in a folder not created yet
+    end
+    if link_dir then
+        -- opened through a symlink: no signs unless the real file is in the link's own repo
+        return git_cmd(link_dir, { 'rev-parse', '--show-toplevel' }, sync, function(top)
+            local root = top.code == 0 and vim.fn.resolve(vim.trim(top.stdout or '')) or nil
+            if not root or path:sub(1, #root + 1) ~= root .. '/' then
+                return done({ kind = 'none' })
+            end
+            load_base(path, ref, sync, done)
+        end)
     end
     git_cmd(dir, { 'ls-files', '--full-name', '--', path }, sync, function(ls)
         if ls.code ~= 0 then
@@ -228,11 +238,11 @@ end
 
 local function too_big(buf, lines)
     local o = opts()
-    if #lines > o.max_lines then
+    if #lines > o.max_size then
         return true
     end
     for _, line in ipairs(lines) do
-        if #line > o.max_line_len then
+        if #line > o.max_size then
             return true
         end
     end
@@ -267,7 +277,7 @@ local function skip(buf)
     return vim.bo[buf].buftype ~= ''
         or vim.bo[buf].binary
         or vim.b[buf].bigfile
-        or api.nvim_buf_line_count(buf) > opts().max_lines
+        or api.nvim_buf_line_count(buf) > opts().max_size
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -313,6 +323,8 @@ function M.refresh(buf, o)
     st.gen = st.gen + 1
     local gen = st.gen
     local result
+    local name = vim.fn.fnamemodify(api.nvim_buf_get_name(buf), ':p')
+    local link_dir = not opts().follow_links and name ~= path and vim.fs.dirname(name) or nil
     load_base(path, base.get(), o.sync, function(res)
         -- the buffer may be gone, or renamed / re-based / invalidated while git ran
         if state[buf] ~= st or st.gen ~= gen or not api.nvim_buf_is_valid(buf) then
@@ -320,7 +332,7 @@ function M.refresh(buf, o)
         end
         st.base, st.status = res, 'ready'
         result = update(buf, st)
-    end)
+    end, link_dir)
     return result
 end
 

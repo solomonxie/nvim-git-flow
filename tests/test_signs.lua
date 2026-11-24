@@ -100,6 +100,36 @@ function T.test_outside_git_has_no_signs()
     h.eq(signs.get_hunks(buf), {}, 'hunks')
 end
 
+-- other/sample.py linked into here/: no signs unless follow_links is on
+local function open_link(follow)
+    local other = h.repo({ 'sample.py' })
+    local here = h.repo({ 'sample.py' })
+    vim.fn.system({ 'ln', '-s', other .. '/sample.py', here .. '/linked.py' })
+    require('nvim-git-flow.config').options.signs.follow_links = follow
+    local buf = h.open(here .. '/linked.py')
+    set(buf, 1, 1, { 'changed' })
+    signs.refresh(buf, { sync = true })
+    require('nvim-git-flow.config').options.signs.follow_links = false
+    return buf
+end
+
+function T.test_link_to_other_repo_has_no_signs()
+    h.eq(signs.get_hunks(open_link(false)), {}, 'hunks')
+end
+
+function T.test_link_to_other_repo_follow_links_on()
+    h.eq(#signs.get_hunks(open_link(true)), 1, 'hunks')
+end
+
+function T.test_link_inside_same_repo_has_signs()
+    local dir = h.repo({ 'sample.py' })
+    vim.fn.system({ 'ln', '-s', dir .. '/sample.py', dir .. '/alias.py' })
+    local buf = h.open(dir .. '/alias.py')
+    set(buf, 1, 1, { 'changed' })
+    signs.refresh(buf, { sync = true })
+    h.eq(#signs.get_hunks(buf), 1, 'hunks')
+end
+
 function T.test_async_open_draws_signs()
     local dir = h.repo({ 'sample.py' })
     local lines = vim.fn.readfile(dir .. '/sample.py')

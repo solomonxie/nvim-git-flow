@@ -14,9 +14,11 @@ M.defaults = {
         linehl = false,
         -- re-diff this long after the last edit
         debounce_ms = 200,
-        -- skip buffers longer than this, or with a line longer than max_line_len
-        max_lines = 10000,
-        max_line_len = 2000,
+        -- skip a buffer with more lines than this, or a line with more characters than this
+        max_size = 20000,
+        -- a file opened through a symlink whose real file is in another repo (or none): false
+        -- shows no signs; true diffs it in the repo it really lives in
+        follow_links = false,
     },
     preview = {
         border = 'rounded',
